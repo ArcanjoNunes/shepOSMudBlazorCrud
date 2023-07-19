@@ -1,0 +1,74 @@
+﻿@page "/reportgenerator"
+@using FastReport
+@using FastReport.Web
+@using FastReport.Web.Blazor.Components
+@using Newtonsoft.Json
+@using shepOSMudBlazorCrud.Models
+@using shepOSMudBlazorCrud.Services
+@inject DataSetService DSService
+@*@inject NavigationManager NavManager*@
+@inject Navigation Navigation
+<h3>shepOS. Preview Report</h3>
+<MudCard Elevation="5" Class="my-1">
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="10" sm="5" md="3" Class="py-3">
+                <MudButton Variant="MudBlazor.Variant.Filled" StartIcon="@Icons.Material.Filled.Backspace" 
+                    Color="MudBlazor.Color.Primary" OnClick="ReturnCaller">Return</MudButton>
+            </MudItem>
+            <MudItem xs="10" sm="5" md="3" Class="py-3">
+                <MudText>@reportTitle</MudText>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+<div style="border: solid gray">
+    <WebReportContainer WebReport="@MyWebReport" />
+</div>
+
+@code {
+
+    public WebReport? MyWebReport { get; set; }
+    private string reportTitle = "";
+
+    protected override void OnInitialized()
+    {
+        string reportFilename = DSService.ReportFilename;
+        if (string.IsNullOrEmpty(reportFilename)) { return; }
+
+        reportTitle = DSService.ReportTitle;
+
+        ToolbarSettings toolbar = new ToolbarSettings()
+            {
+                Color = System.Drawing.Color.Orange,
+                //DropDownMenuColor = Color.IndianRed,
+                //IconColor = IconColors.Left,
+                //Position = Positions.Left,
+                //IconTransparency = IconTransparencyEnum.Low,
+            };
+
+        Report report = Report.FromFile(reportFilename);
+        report.RegisterData(DSService.ReportDataSet, DSService.ReportDSSchema); // <TableDataSource Name="Customers" ReferenceName="NorthWind.Customers" DataType="System.Int32" Enabled="true">
+
+        string sXMLGlobalization = shepOS.ReportActions.GetXMLReportSetup(report.FileName, shepOS.ReportActions.XMLReportSetup.Globalization, DSService.resLanguageId);
+
+        // Parameters
+        report.SetParameterValue("DataSchema", "");
+        report.SetParameterValue("resGlobalization", sXMLGlobalization);
+        report.SetParameterValue("resLanguageID", DSService.resLanguageId);
+        report.SetParameterValue("UserID", DSService.userId);
+        report.SetParameterValue("UserName", DSService.userName);
+        report.SetParameterValue("inDate", DateTime.Now);
+
+        MyWebReport = new WebReport
+        {  
+            Toolbar = toolbar,
+            Report = report 
+        };
+    }
+
+    private void ReturnCaller()
+    {
+        Navigation.NavigateBack();
+    }
+}

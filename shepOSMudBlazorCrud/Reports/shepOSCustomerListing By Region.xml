@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shepOSSetup>
+  <shepOSLanguage>
+    <lang0>Lista por Região</lang0>
+    <lang1>Lista por Región</lang1>
+    <lang2>Listing by Region </lang2>
+  </shepOSLanguage>
+  <shepOSGlobalization>
+    <lang0>LISTA DE CLIENTES;ID;Nome;Sobrenome;Telefone;Região;Total;</lang0>
+    <lang1>LISTA DE CLIENTES;ID;Nome;Apellido;Teléfono;Región;Total;</lang1>
+  </shepOSGlobalization>
+</shepOSSetup>

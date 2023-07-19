@@ -1,0 +1,49 @@
+﻿@page "/"
+@using static shepOSMudBlazorCrud.Services.CustomerService;
+@inject shepOSMudBlazorCrud.Services.ICustomerService customerService
+<h1>DASHBOARD</h1>
+<h3>Blazor-ApexCharts</h3>
+
+<div style="border: solid thin black">
+    <ApexChart TItem="ResultGroup" Options="GetOptions()" Title="Population per Region">
+        <ApexPointSeries SeriesType="SeriesType.Bar" Name="Population"
+                         TItem="ResultGroup"
+                         Items="oRegions"
+                         XValue="@(r => r.Title)"
+					     YAggregate="@(r => r.Sum(r => r.Total))"
+                         OrderByDescending="@(r => r.Y)"
+                    />
+	</ApexChart>
+</div>
+@code {
+
+    public IOrderedEnumerable<ResultGroup>? oRegions;
+
+    protected override void OnInitialized()
+    {
+        oRegions = customerService.GetRegionSummary();
+    }
+
+    private ApexCharts.ApexChartOptions<ResultGroup> GetOptions()
+    {
+        var options = new ApexCharts.ApexChartOptions<ResultGroup>();
+        options.Chart = new Chart
+        {
+            Animations = new()
+            {
+                Enabled = true,
+                Easing = Easing.Linear,
+                DynamicAnimation = new()
+                {
+                    Speed = 1000
+                }
+            }
+        };
+        options.Theme = new Theme
+            {
+                Palette = PaletteType.Palette1,
+                Mode = Mode.Dark
+            };
+        return options;
+    }
+}

@@ -1,0 +1,268 @@
+﻿@page "/customerbinder"
+@using Newtonsoft.Json
+@using shepOSMudBlazorCrud.Models
+@using shepOSMudBlazorCrud.Services
+@using MudBlazor.Services
+@using System.Globalization
+@using Localization
+@inject Navigation Navigation
+@inject shepOSMudBlazorCrud.Services.IUserDataSchemaService udsservice
+@inject shepOSMudBlazorCrud.Services.ICustomerService customerService
+@inject shepOSMudBlazorCrud.Services.IComboboxItemService comboboxService
+@inject MudBlazor.ISnackbar snackBar
+@inject DataSetService DSService
+@inject IDialogService DialogService
+@inject IStringLocalizer<shepOSresMessage> shepOSResource
+
+@if (customers == null)
+{
+    <MudProgressCircular Color="MudBlazor.Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Hover="@hover" Items="customers" Filter="new Func<Customer, bool>(Search)" @bind-customer="customer"
+              Square="false" Dense="true" Striped="true" Bordered="true" FixedHeader="true" FixedFooter="true"
+              Elevation="15" Height="305px" RowsPerPage="5">
+        <ToolBarContent>
+            <MudText Typo="Typo.h3">@shepOSResource.GetString("wrdCustomer")</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder=@shepOSResource.GetString("msgSearchOnFields") Adornment="Adornment.Start" 
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Customer, object>(x=>x.Id)">@shepOSResource.GetString("wrdID")</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Customer, object>(x=>x.FirstName)">@shepOSResource.GetString("wrdName")</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Customer, object>(x=>x.LastName)">@shepOSResource.GetString("wrdSureName")</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Customer, object>(x=>x.PhoneNumber)">@shepOSResource.GetString("wrdPhone")</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Customer, object>(x=>x.Region)">@shepOSResource.GetString("wrdRegion")</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Id</MudTd>
+            <MudTd>@context.FirstName</MudTd>
+            <MudTd>@context.LastName</MudTd>
+            <MudTd>@context.PhoneNumber</MudTd>
+            <MudTd>@context.RegionTitle</MudTd>
+            <MudTd DataLabel="">
+                <MudFab @onclick="@(() => EditRecord(@context.Id))" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(() => DeleteRecord(@context.Id))" Color="MudBlazor.Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager HideRowsPerPage="true" />
+        </PagerContent>
+    </MudTable>
+    <MudCard Elevation="15" Class="my-1">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">@shepOSResource.GetString("wrdRecord").</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField @bind-Value="customer.FirstName" Required="true" RequiredError=@shepOSResource.GetString("msgRequiredField") 
+                        Label=@shepOSResource.GetString("wrdName") Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField @bind-Value="customer.LastName" Required="true" RequiredError=@shepOSResource.GetString("msgRequiredField") 
+                        Label=@shepOSResource.GetString("wrdSureName") Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField @bind-Value="customer.PhoneNumber" Label=@shepOSResource.GetString("wrdPhone") Variant="Variant.Outlined" 
+                        Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudSelect T="ComboboxItemDTO" @bind-Value="oComboboxSelected" Label=@shepOSResource.GetString("wrdRegion")
+                               OpenIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="MudBlazor.Color.Secondary" FullWidth="true"
+                        Text="@oComboboxSelected.Title">
+                        @if (oComboboxItems is null) { return; }
+                        @foreach (ComboboxItemDTO oItem in oComboboxItems)
+                        {
+                            <MudSelectItem Value="@oItem">@oItem.Title</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+    <MudCard Elevation="15" Class="my-1">
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="10" sm="5" md="3" Class="py-9">
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="SaveRecord">@shepOSResource.GetString("wrdSave")</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Error" OnClick="CancelRecord">@shepOSResource.GetString("wrdCancel")</MudButton>
+                </MudItem>
+                <MudItem xs="10" sm="5" md="3">
+                    <MudAlert Severity="Severity.Info">@smMessage</MudAlert>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudSelect T="shepOS.ReportRecord" @bind-Value="@oReportRecord" Label=@shepOSResource.GetString("wrdReport")
+                               OpenIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="MudBlazor.Color.Secondary" FullWidth="true">
+                        @if (oReportList is null) { return; }
+                        @foreach (shepOS.ReportRecord oReport in oReportList)
+                        {
+                            <MudSelectItem Value="@oReport">@oReport.reportTitle</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="5" sm="2" md="1" Class="py-9">
+                    <MudButton Variant="Variant.Filled" Size="Size.Small" Color="MudBlazor.Color.Dark" EndIcon="@Icons.Material.Filled.Preview" 
+                               OnClick="PrintContents">@shepOSResource.GetString("wrdPrint")</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+
+    <MudDialog @bind-IsVisible="visibleDialog">
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Class="mr-3" />@shepOSResource.GetString("msgAskforConfirmation")
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <p>@DialogMessage</p>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" OnClick="CancelDelete" Class="px-10">@shepOSResource.GetString("wrdCancel")</MudButton>
+            <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Error" OnClick="ConfirmDelete" Class="px-10">@shepOSResource.GetString("wrdDelete")</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    // Setup
+    private string DialogMessage = "";
+    private string smMessage = "";
+    private bool hover = true;
+    private string searchString = "";
+
+    // Report
+    private static string sReportPath = Path.Combine(shepOS.shepOSLibrary.sAppWebPath, "Reports");
+    private static string sReportPrefix = "shepOSCustomer";
+    public List<shepOS.ReportRecord>? oReportList;
+    private shepOS.ReportRecord? oReportRecord;
+
+    // Customer
+    private Customer customer = new Customer();
+    private List<Customer> customers = new List<Customer>();
+
+    // Combobox Item
+    private ComboboxItemDTO oComboboxSelected = new ComboboxItemDTO();
+    private List<ComboboxItemDTO>? oComboboxItems;
+
+    // Life Cycle Component
+    protected override void OnInitialized()
+    {
+        GetComboboxItems();
+        GetReportList();
+        GetCustomers();
+    }
+
+    #region User Events
+
+    private void GetComboboxItems()
+    {
+        oComboboxItems = comboboxService.GetComboboxList(1);
+        oComboboxSelected = oComboboxItems.Count > 0 ? oComboboxItems[0] : comboboxService.GetEmpty();
+    }
+
+    private void GetCustomers()
+    {
+        customers = customerService.GetCustomers();
+    }
+
+    private void GetReportList()
+    {
+        oReportList = shepOS.ReportActions.GetReportModels(sReportPath, sReportPrefix, DSService.resLanguageId);
+        oReportRecord = oReportList.Count == 0 ? null : oReportList[0];
+    }
+
+    private void ReloadCustomers()
+    {
+        smMessage = "";
+        GetCustomers();
+        StateHasChanged();
+    }
+
+    private bool Search(Customer customer)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        smMessage = "";
+        return (customer.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                customer.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                customer.RegionTitle.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                customer.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+    }
+
+    #endregion
+
+    #region System Events
+
+    private void EditRecord(int id)
+    {
+        smMessage = "";
+        customer = customers.FirstOrDefault(c => c.Id == id) ?? new Customer();
+        oComboboxSelected = comboboxService.GetRecord(1, customer.Region);
+    }
+
+    private void SaveRecord()
+    {
+        smMessage = customer.Validate();
+        if (!string.IsNullOrEmpty(smMessage)) { return; }
+
+        customer.Region = oComboboxSelected.Code;
+        customerService.SaveCustomer(customer);
+
+        customer = new Customer();
+        snackBar.Add(shepOSResource.GetString("wrdSaved"), Severity.Success);
+        ReloadCustomers();
+    }
+
+    private void CancelRecord()
+    {
+        customerService.ReloadCustomer(ref customer);
+        customer = new Customer();
+        ReloadCustomers();
+    }
+
+    private int SelectedRecordID = 0;
+    private void DeleteRecord(int id)
+    {
+        SelectedRecordID = id;
+        CallDeleteRecordConfirmation();
+    }
+
+    private void PrintContents()
+    {
+        if (oReportRecord == null) { return; }
+
+        DSService.ReportFilename = oReportRecord.reportFile;
+        DSService.ReportTitle = oReportRecord.reportTitle;
+
+        DSService.ClearDataSet();
+
+        DSService.ReportDataSet.Tables.Add(udsservice.GetUserDataSchemaRecord());
+        DSService.ReportDataSet.Tables.Add(customerService.GetCustomerList(customers));
+
+        Navigation.NavigateTo("reportgenerator");
+    }
+
+    private bool visibleDialog = false;
+    private void CallDeleteRecordConfirmation()
+    {
+        DialogMessage = shepOSResource.GetString("msgDeleteRecord", SelectedRecordID); 
+        visibleDialog = true;
+    }
+
+    private void CancelDelete() => visibleDialog = false;
+    private void ConfirmDelete()
+    {
+        visibleDialog = false;
+
+        customerService.DeleteCustomer(SelectedRecordID);
+        ReloadCustomers();
+    }
+
+    #endregion
+}
+

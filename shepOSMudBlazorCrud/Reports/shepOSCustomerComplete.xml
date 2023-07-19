@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shepOSSetup>
+  <shepOSLanguage>
+    <lang0>Lista Completa</lang0>
+    <lang1>Lista Completa</lang1>
+    <lang2>Full List</lang2>
+  </shepOSLanguage>
+  <shepOSGlobalization>
+    <lang0>LISTA DE CLIENTES;ID;Nome;Sobrenome;Telefone;Região;</lang0>
+    <lang1>LISTA DE CLIENTES;ID;Nome;Apellido;Teléfono;Región;</lang1>
+  </shepOSGlobalization>
+</shepOSSetup>
