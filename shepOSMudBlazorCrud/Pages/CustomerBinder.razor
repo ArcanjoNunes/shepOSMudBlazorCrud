@@ -27,7 +27,7 @@ else
             <MudText Typo="Typo.h3">@shepOSResource.GetString("wrdCustomer")</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder=@shepOSResource.GetString("msgSearchOnFields") Adornment="Adornment.Start" 
-                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<Customer, object>(x=>x.Id)">@shepOSResource.GetString("wrdID")</MudTableSortLabel></MudTh>
@@ -43,8 +43,8 @@ else
             <MudTd>@context.PhoneNumber</MudTd>
             <MudTd>@context.RegionTitle</MudTd>
             <MudTd DataLabel="">
-                <MudFab @onclick="@(() => EditRecord(@context.Id))" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                <MudFab @onclick="@(() => DeleteRecord(@context.Id))" Color="MudBlazor.Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(() => EditRecord(@context.Id))" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" />
+                <MudFab @onclick="@(() => DeleteRecord(@context.Id))" Color="MudBlazor.Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" />
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -106,7 +106,7 @@ else
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="5" sm="2" md="1" Class="py-9">
-                    <MudButton Variant="Variant.Filled" Size="Size.Small" Color="MudBlazor.Color.Dark" EndIcon="@Icons.Material.Filled.Preview" 
+                    <MudButton Variant="Variant.Filled" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Dark" EndIcon="@Icons.Material.Filled.Preview"
                                OnClick="PrintContents">@shepOSResource.GetString("wrdPrint")</MudButton>
                 </MudItem>
             </MudGrid>

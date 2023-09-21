@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shepOSMudBlazorCrud", "shep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "clibReportRecord", "..\..\..\shepOSClassLib\clibReportRecord\clibReportRecord\clibReportRecord.csproj", "{E251F71F-D412-4D02-B5BE-65AB6D6FB844}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clibReportGenerator", "..\..\..\shepOSClassLib\clibReportGenerator\clibReportGenerator.csproj", "{39AC78DA-3B22-4A15-8F61-B8FD673A1896}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{E251F71F-D412-4D02-B5BE-65AB6D6FB844}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E251F71F-D412-4D02-B5BE-65AB6D6FB844}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E251F71F-D412-4D02-B5BE-65AB6D6FB844}.Release|Any CPU.Build.0 = Release|Any CPU
-		{39AC78DA-3B22-4A15-8F61-B8FD673A1896}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{39AC78DA-3B22-4A15-8F61-B8FD673A1896}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{39AC78DA-3B22-4A15-8F61-B8FD673A1896}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{39AC78DA-3B22-4A15-8F61-B8FD673A1896}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

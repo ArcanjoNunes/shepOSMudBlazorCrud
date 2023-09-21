@@ -20,6 +20,7 @@ StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configurat
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+builder.Services.AddFastReport();
 
 builder.Services.AddScoped<IUserDataSchemaService, UserDataSchemaService>();
 builder.Services.AddScoped<IComboboxItemService, ComboboxItemService>();
